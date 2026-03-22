@@ -1,0 +1,52 @@
+﻿# --- Maven ---
+target/
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# --- Java ---
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+
+# --- OS System Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Security, Secrets & Environment Variables ---
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.pkcs12
+*.jks
+secrets.json
+credentials.json
+
+application-secret.properties
+application-dev.yml
+
+# --- Database & Dữ liệu cục bộ ---
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.mdf
+*.ldf
+*.sql
+
+logs/
+*.log.*

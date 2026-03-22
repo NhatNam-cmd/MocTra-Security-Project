@@ -1,0 +1,23 @@
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@400&display=swap');
+
+:root {
+
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+    --space-xxxl: 64px;
+
+
+    --font-primary: 'Lora', serif;
+    --font-secondary: 'Montserrat', sans-serif;
+
+
+    --color-primary: #107e84;
+    --color-text: #191919;
+}
