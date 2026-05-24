@@ -38,6 +38,9 @@
                 <a href="don-hang"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng của tôi</a>
             </li>
 
+            <li class="${param.activePage == 'key' ? 'active' : ''}">
+                <a href="key"><i class="bi bi-key-fill"></i> Quản lý khóa</a>
+            </li>
 
             <li>
                 <a href="logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
