@@ -36,6 +36,11 @@
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span>Đơn hàng của tôi</span>
                 </a>
+
+                <a href="key-management.jsp" class="grid-card">
+                    <i class="bi bi-key"></i>
+                    <span>Quản lý khóa</span>
+                </a>
             </div>
         </main>
 
