@@ -47,6 +47,8 @@ application-dev.yml
 *.mdf
 *.ldf
 *.sql
-
+*.xml
 logs/
 *.log.*
+
+!db_migration/*.sql

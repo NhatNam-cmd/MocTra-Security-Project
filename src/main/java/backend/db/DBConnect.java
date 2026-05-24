@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DBConnect {
 
-    private static String url = "jdbc:mysql://127.0.0.1:3306/moctra_db?useUnicode=true&characterEncoding=utf-8&connectTimeout=3000";
+    private static String url = "jdbc:mysql://127.0.0.1:3306/moctras_db?useUnicode=true&characterEncoding=utf-8&connectTimeout=3000";
     private static String user = "root";
     private static String password = "";
 
@@ -25,7 +25,7 @@ public class DBConnect {
         System.out.println("Đang thử kết nối đến MySQL...");
         Connection conn = getConnection();
         if (conn != null) {
-            System.out.println("✅ Kết nối thành công tới database: moctra_db!");
+            System.out.println("✅ Kết nối thành công tới database: moctras_db!");
         } else {
             System.out.println("❌ Kết nối thất bại!");
         }

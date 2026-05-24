@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "CheckoutServlet", value = "/thanh-toan")
-public class CheckoutServlet extends HttpServlet {
+public class CheckoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
