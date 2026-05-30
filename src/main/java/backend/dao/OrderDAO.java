@@ -238,6 +238,14 @@ public class OrderDAO {
                 } else {
                     o.setNotes(rs.getString("notes"));
                 }
+                try { o.setOrderHash(rs.getString("order_hash")); } catch (Exception e) {}
+                try { o.setSignature(rs.getString("signature")); } catch (Exception e) {}
+                try {
+                    int pkId = rs.getInt("public_key_id");
+                    if (!rs.wasNull()) o.setPublicKeyId(pkId);
+                } catch (Exception e) {}
+                try { o.setTampered(rs.getBoolean("is_tampered")); } catch (Exception e) {}
+
                 o.setItems(getOrderItems(o.getId()));
             }
         } catch (SQLException e) {
