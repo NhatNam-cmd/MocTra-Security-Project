@@ -64,6 +64,18 @@
                                 </div>
                             </div>
                             <div class="order-status">
+                                <c:choose>
+                                    <c:when test="${empty o.signature}">
+                                        <span class="status-badge" style="background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2;">
+                                            <i class="fa-solid fa-pen-nib"></i> Chờ ký
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="status-badge" style="background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7;">
+                                            <i class="fa-solid fa-check-double"></i> Đã ký
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
 
 
@@ -77,7 +89,12 @@
                                 </c:choose>
                             </div>
                         </div>
-
+                        <c:if test="${o.tampered}">
+                            <div class="alert-tampered" style="background: #fdecea; color: #c62828; padding: 15px 20px; border-bottom: 1px solid #f5c6cb; font-size: 0.95em;">
+                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2em; margin-right: 8px;"></i>
+                                <strong>CẢNH BÁO BẢO MẬT:</strong> Dữ liệu của đơn hàng này đã bị can thiệp trái phép hoặc chữ ký không hợp lệ! Vui lòng chụp màn hình và liên hệ Admin ngay lập tức.
+                            </div>
+                        </c:if>
                         <div class="order-card-body">
                             <div class="order-items">
                                 <c:forEach var="item" items="${o.items}">
@@ -116,7 +133,7 @@
                             <div class="shipping-address">
                                 <strong><i class="fa-solid fa-location-dot"></i> Địa chỉ giao hàng:</strong><br>
 
-                                    ${o.notes}
+                                    ${o.fullAddress}
                             </div>
 
                             <div class="order-footer">
@@ -125,26 +142,40 @@
                                     <strong>${o.paymentMethod == 'cod' ? 'Thanh toán khi nhận hàng (COD)' : o.paymentMethod}</strong>
                                 </div>
                                 <div class="order-actions">
-                                    <a href="hoa-don?id=${o.id}" class="btn-action btn-outline">
-                                        <i class="fa-solid fa-eye"></i> Chi tiết
-                                    </a>
+                                    <c:choose>
+                                        <c:when test="${empty o.signature}">
+                                            <a href="hoa-don?id=${o.id}" class="btn-action btn-primary" style="background-color: #e67e22; border-color: #e67e22;">
+                                                <i class="fa-solid fa-file-signature"></i> Tiếp tục ký
+                                            </a>
+                                            <form action="cancel-order" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
+                                                <input type="hidden" name="orderId" value="${o.id}">
+                                                <button type="submit" class="btn-action btn-secondary">
+                                                    <i class="fa-solid fa-times"></i> Hủy đơn
+                                                </button>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="hoa-don?id=${o.id}" class="btn-action btn-outline">
+                                                <i class="fa-solid fa-eye"></i> Chi tiết
+                                            </a>
 
-                                    <c:if test="${statusStr == 'PENDING'}">
-                                        <form action="cancel-order" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
-                                            <input type="hidden" name="orderId" value="${o.id}">
-                                            <button type="submit" class="btn-action btn-secondary">
-                                                <i class="fa-solid fa-times"></i> Hủy đơn
-                                            </button>
-                                        </form>
-                                    </c:if>
+                                            <c:if test="${statusStr == 'PENDING'}">
+                                                <form action="cancel-order" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
+                                                    <input type="hidden" name="orderId" value="${o.id}">
+                                                    <button type="submit" class="btn-action btn-secondary">
+                                                        <i class="fa-solid fa-times"></i> Hủy đơn
+                                                    </button>
+                                                </form>
+                                            </c:if>
 
-                                    <c:if test="${statusStr == 'COMPLETED' || statusStr == 'CANCELLED'}">
-                                        <a href="san-pham" class="btn-action btn-primary">
-                                            <i class="fa-solid fa-rotate"></i> Mua lại
-                                        </a>
-                                    </c:if>
+                                            <c:if test="${statusStr == 'COMPLETED' || statusStr == 'CANCELLED'}">
+                                                <a href="san-pham" class="btn-action btn-primary">
+                                                    <i class="fa-solid fa-rotate"></i> Mua lại
+                                                </a>
+                                            </c:if>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </c:forEach>

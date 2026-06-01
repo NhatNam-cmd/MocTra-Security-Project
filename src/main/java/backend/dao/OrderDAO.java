@@ -80,12 +80,19 @@ public class OrderDAO {
 
                     String fullAddr = String.format("<strong>%s - %s</strong><br>%s, %s, %s",
                             fullName, phone, street, ward, province);
-                    o.setNotes(fullAddr);
+                    o.setFullAddress(fullAddr);
                 } else {
-                    o.setNotes("Địa chỉ đã bị xóa hoặc không tồn tại.");
+                    o.setFullAddress("Địa chỉ đã bị xóa hoặc không tồn tại.");
                 }
 
-
+                o.setNotes(rs.getString("notes"));
+                try { o.setOrderHash(rs.getString("order_hash")); } catch (Exception e) {}
+                try { o.setSignature(rs.getString("signature")); } catch (Exception e) {}
+                try {
+                    int pkId = rs.getInt("public_key_id");
+                    if (!rs.wasNull()) o.setPublicKeyId(pkId);
+                } catch (Exception e) {}
+                try { o.setTampered(rs.getBoolean("is_tampered")); } catch (Exception e) {}
                 o.setItems(getOrderItems(o.getId()));
 
                 list.add(o);
@@ -160,10 +167,7 @@ public class OrderDAO {
 
     private List<OrderItem> getOrderItems(int orderId) {
         List<OrderItem> items = new ArrayList<>();
-        String sql = "SELECT oi.*, p.name, p.image_url " +
-                "FROM order_items oi " +
-                "JOIN products p ON oi.product_id = p.id " +
-                "WHERE oi.order_id = ?";
+        String sql = "SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ? ORDER BY oi.id ASC";
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

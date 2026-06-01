@@ -130,6 +130,8 @@ public class CheckoutController extends HttpServlet {
                         .append(item.getProduct().getId()).append(":")
                         .append(item.getQuantity());
             }
+            System.out.println("=== CHUỖI GỐC LÚC CHECKOUT ===");
+            System.out.println(dataToHash.toString());
             String orderHash = SecurityUtils.hashOrderData(dataToHash.toString());
             order.setOrderHash(orderHash);
 
