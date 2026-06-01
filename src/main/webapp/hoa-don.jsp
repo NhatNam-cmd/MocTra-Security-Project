@@ -104,7 +104,7 @@
                                 <h2 class="checkout-card__title">Thông tin giao hàng</h2>
                                 <div class="invoice-info">
                                     <p class="invoice-address" id="shippingAddress">
-                                            ${order.notes}
+                                            ${o.fullAddress}
                                     </p>
 
                                     <p><strong>Phương thức giao hàng:</strong>
