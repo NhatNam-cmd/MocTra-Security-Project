@@ -9,6 +9,7 @@ import backend.model.CartItem;
 import backend.model.User;
 import backend.model.UserAddress;
 import backend.model.Order;
+import backend.security.SecurityUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -115,6 +116,31 @@ public class CheckoutController extends HttpServlet {
         order.setPaymentMethod(paymentMethod);
         order.setNotes(note);
 
+        try {
+            StringBuilder dataToHash = new StringBuilder();
+            dataToHash.append(order.getOrderNumber()).append("|")
+                    .append(order.getUserId()).append("|")
+                    .append(shippingAddressId).append("|")
+                    .append(order.getNotes()).append("|")
+                    .append(order.getShippingFee()).append("|")
+                    .append(order.getTotalAmount()).append("|")
+                    .append(order.getPaymentMethod());
+            for (CartItem item : cart.getItems()) {
+                dataToHash.append("|")
+                        .append(item.getProduct().getId()).append(":")
+                        .append(item.getQuantity());
+            }
+            System.out.println("=== CHUỖI GỐC LÚC CHECKOUT ===");
+            System.out.println(dataToHash.toString());
+            String orderHash = SecurityUtils.hashOrderData(dataToHash.toString());
+            order.setOrderHash(orderHash);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Hệ thống gặp lỗi bảo mật khi khởi tạo dữ liệu đơn hàng. Vui lòng thử lại!");
+            doGet(request, response);
+            return;
+        }
 
         OrderDAO orderDAO = new OrderDAO();
         int orderId = orderDAO.createOrder(order);
