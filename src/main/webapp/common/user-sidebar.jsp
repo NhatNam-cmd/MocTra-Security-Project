@@ -39,7 +39,7 @@
             </li>
 
             <li class="${param.activePage == 'key' ? 'active' : ''}">
-                <a href="key"><i class="bi bi-key-fill"></i> Quản lý khóa</a>
+                <a href="key"><i class="fa-solid fa-key"></i> Quản lý khóa</a>
             </li>
 
             <li>

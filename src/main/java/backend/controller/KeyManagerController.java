@@ -71,9 +71,9 @@ public class KeyManagerController extends HttpServlet {
     }
 
     private void setKeyPageAttributes(HttpServletRequest request, int userId) {
-        UserKey      activeKey = userKeyDAO.getActivePublicKeyByUserId(userId);
+        UserKey activeKey = userKeyDAO.getActivePublicKeyByUserId(userId);
         List<UserKey> allKeys  = userKeyDAO.getAllKeysByUserId(userId);
-        int           keyCount = userKeyDAO.getKeyCount(userId);
+        int keyCount = userKeyDAO.getKeyCount(userId);
 
         request.setAttribute("activeKey", activeKey);
         request.setAttribute("allKeys",   allKeys);
@@ -84,6 +84,7 @@ public class KeyManagerController extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            HttpSession session = request.getSession();
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
             keyGen.initialize(DSA_KEY_SIZE);
             KeyPair keyPair = keyGen.generateKeyPair();
@@ -99,7 +100,7 @@ public class KeyManagerController extends HttpServlet {
 
             if (saved) {
                 setKeyPageAttributes(request, userId);
-                request.setAttribute("newPrivateKey",  privateKeyBase64);
+                session.setAttribute("newPrivateKey", privateKeyBase64);
                 request.setAttribute("successMessage", "Tạo cặp khóa thành công! Hãy tải về private.key ngay.");
                 request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
             } else {
@@ -155,8 +156,9 @@ public class KeyManagerController extends HttpServlet {
     private void downloadPrivateKey(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        String privateKeyData = request.getParameter("privateKey");
+        String privateKeyData = request.getSession().getAttribute("newPrivateKey").toString();
 
+        request.getSession().removeAttribute("newPrivateKey");
         if (privateKeyData == null || privateKeyData.trim().isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                     "Không có private key để tải về");
