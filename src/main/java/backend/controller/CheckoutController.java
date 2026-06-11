@@ -9,6 +9,7 @@ import backend.model.CartItem;
 import backend.model.User;
 import backend.model.UserAddress;
 import backend.model.Order;
+import backend.model.OrderItem;
 import backend.security.SecurityUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -116,23 +117,20 @@ public class CheckoutController extends HttpServlet {
         order.setPaymentMethod(paymentMethod);
         order.setNotes(note);
 
+        OrderDAO orderDAO = new OrderDAO();
         try {
-            StringBuilder dataToHash = new StringBuilder();
-            dataToHash.append(order.getOrderNumber()).append("|")
-                    .append(order.getUserId()).append("|")
-                    .append(shippingAddressId).append("|")
-                    .append(order.getNotes()).append("|")
-                    .append(order.getShippingFee()).append("|")
-                    .append(order.getTotalAmount()).append("|")
-                    .append(order.getPaymentMethod());
+            List<OrderItem> auditItems = new ArrayList<>();
             for (CartItem item : cart.getItems()) {
-                dataToHash.append("|")
-                        .append(item.getProduct().getId()).append(":")
-                        .append(item.getQuantity());
+                OrderItem auditItem = new OrderItem();
+                auditItem.setProductId(item.getProduct().getId());
+                auditItem.setQuantity(item.getQuantity());
+                auditItems.add(auditItem);
             }
+            order.setItems(auditItems);
+            String auditData = orderDAO.buildOrderAuditData(order);
             System.out.println("=== CHUỖI GỐC LÚC CHECKOUT ===");
-            System.out.println(dataToHash.toString());
-            String orderHash = SecurityUtils.hashOrderData(dataToHash.toString());
+            System.out.println(auditData);
+            String orderHash = SecurityUtils.hashOrderData(auditData);
             order.setOrderHash(orderHash);
 
         } catch (Exception e) {
@@ -142,7 +140,6 @@ public class CheckoutController extends HttpServlet {
             return;
         }
 
-        OrderDAO orderDAO = new OrderDAO();
         int orderId = orderDAO.createOrder(order);
 
         if (orderId > 0) {

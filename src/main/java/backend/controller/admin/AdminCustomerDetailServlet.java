@@ -3,9 +3,11 @@ package backend.controller.admin;
 import backend.dao.OrderDAO;
 import backend.dao.UserAddressDAO;
 import backend.dao.UserDAO;
+import backend.dao.UserKeyDAO;
 import backend.model.Order;
 import backend.model.User;
 import backend.model.UserAddress;
+import backend.model.UserKey;
 import backend.model.enums.UserRole;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -50,6 +52,7 @@ public class AdminCustomerDetailServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             ReviewDAO reviewDAO = new ReviewDAO();
             BlogCommentDAO blogCommentDAO = new BlogCommentDAO();
+            UserKeyDAO userKeyDAO = new UserKeyDAO();
 
 
             User customer = userDAO.getUserDetailById(userId);
@@ -62,6 +65,7 @@ public class AdminCustomerDetailServlet extends HttpServlet {
             List<Order> orders = orderDAO.getOrdersByUserId(userId);
             List<ProductReview> reviews = reviewDAO.getReviewsByUserId(userId);
             List<BlogComment> comments = blogCommentDAO.getByUserId(userId);
+            List<UserKey> userKeys = userKeyDAO.getAllKeysByUserId(userId);
 
             List<UserActivityDTO> activities = new ArrayList<>();
             DecimalFormat df = new DecimalFormat("#,###");
@@ -152,6 +156,7 @@ public class AdminCustomerDetailServlet extends HttpServlet {
             request.setAttribute("addresses", addresses);
             request.setAttribute("orders", orders);
             request.setAttribute("reviews", reviews);
+            request.setAttribute("userKeys", userKeys);
             request.setAttribute("activities", activities);
 
             request.setAttribute("totalOrders", (orders != null) ? orders.size() : 0);

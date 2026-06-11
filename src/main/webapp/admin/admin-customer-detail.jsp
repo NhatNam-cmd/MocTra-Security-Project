@@ -218,6 +218,59 @@
                 </div>
 
                 <div class="detail-card full-width-card">
+                    <h3 class="card-title"><i class="fas fa-key"></i> Lịch sử khóa bảo mật (${userKeys.size()} khóa)</h3>
+                    <div class="table-responsive">
+                        <table class="orders-table">
+                            <thead>
+                            <tr>
+                                <th>ID khóa</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày báo mất</th>
+                                <th>Public key</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:if test="${empty userKeys}">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding:15px;">Khách hàng chưa tạo khóa bảo mật nào</td>
+                                </tr>
+                            </c:if>
+                            <c:forEach var="key" items="${userKeys}">
+                                <tr>
+                                    <td><span class="order-number">#${key.id}</span></td>
+                                    <td>${fn:replace(fn:substring(key.createdAt, 0, 16), 'T', ' ')}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${key.status == 'ACTIVE'}">
+                                                <span class="status-badge status-active">ACTIVE</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="status-badge status-cancelled">REVOKED</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty key.revokedAt}">
+                                                ${fn:replace(fn:substring(key.revokedAt, 0, 16), 'T', ' ')}
+                                            </c:when>
+                                            <c:otherwise>---</c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <code style="display:block; max-width: 420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                ${key.publicKeyContent}
+                                        </code>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="detail-card full-width-card">
                     <h3 class="card-title"><i class="fas fa-history"></i> Lịch sử đơn hàng (${orders.size()} đơn)</h3>
                     <div class="table-responsive">
                         <table class="orders-table">
