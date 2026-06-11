@@ -123,13 +123,14 @@
                             <th>Sản phẩm</th>
                             <th>Tổng tiền</th>
                             <th>Trạng thái</th>
+                            <th>Bảo mật</th>
                             <th>Ngày đặt</th>
                             <th>Thao tác</th>
                         </tr>
                         </thead>
                         <tbody>
                         <c:forEach var="o" items="${orders}">
-                            <tr>
+                            <tr class="${o.tampered ? 'security-row-tampered' : (o.keyWarning ? 'security-row-warning' : '')}">
                                 <td class="check-col">
                                     <input type="checkbox" class="product-checkbox order-check" value="${o.id}">
                                 </td>
@@ -164,6 +165,34 @@
                                         <c:when test="${o.status == 'PENDING'}"><span class="status-badge status-pending">Chờ xử lý</span></c:when>
                                         <c:when test="${o.status == 'COMPLETED'}"><span class="status-badge status-active">Hoàn tất</span></c:when>
                                         <c:when test="${o.status == 'CANCELLED'}"><span class="status-badge status-inactive">Đã hủy</span></c:when>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${o.tampered}">
+                                            <span class="security-badge security-badge-danger" title="Dữ liệu đơn hàng bị can thiệp">
+                                                <i class="fa-solid fa-shield-halved"></i>
+                                                Dữ liệu bị can thiệp
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${o.keyWarning}">
+                                            <span class="security-badge security-badge-warning" title="Đơn hàng ký bằng khóa đã báo mất">
+                                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                                Khóa đã báo mất
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${empty o.signature}">
+                                            <span class="security-badge security-badge-muted" title="Đơn hàng chưa có chữ ký điện tử">
+                                                <i class="fa-regular fa-clock"></i>
+                                                Chưa ký
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="security-badge security-badge-safe" title="Chữ ký hợp lệ và dữ liệu toàn vẹn">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Toàn vẹn
+                                            </span>
+                                        </c:otherwise>
                                     </c:choose>
                                 </td>
                                 <td>
