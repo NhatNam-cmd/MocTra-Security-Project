@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -126,6 +127,73 @@
                                 <c:if test="${order.paymentStatus == 'PENDING'}">
                                     <span class="status-badge status-pending" style="color: #856404; background: #fff3cd;">Chưa thanh toán</span>
                                 </c:if>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card pki-card">
+                        <h3 class="card-title">Thông tin xác thực PKI</h3>
+
+                        <div class="info-row">
+                            <span class="info-label">Trạng thái bảo mật</span>
+                            <div class="info-value">
+                                <c:choose>
+                                    <c:when test="${order.tampered}">
+                                        <span class="pki-status pki-status-danger">
+                                            <i class="fa-solid fa-shield-halved"></i> Bị can thiệp
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${order.keyWarning}">
+                                        <span class="pki-status pki-status-warning">
+                                            <i class="fa-solid fa-shield-halved"></i> Khóa đã báo mất
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${empty order.signature}">
+                                        <span class="pki-status pki-status-muted">
+                                            <i class="fa-solid fa-shield-halved"></i> Chưa ký
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="pki-status pki-status-safe">
+                                            <i class="fa-solid fa-shield-halved"></i> Toàn vẹn
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Mã hash đơn hàng</span>
+                            <code class="pki-code">${empty order.orderHash ? '---' : order.orderHash}</code>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">ID Public Key đã dùng</span>
+                            <div class="info-value">
+                                <c:choose>
+                                    <c:when test="${not empty order.publicKeyId}">#${order.publicKeyId}</c:when>
+                                    <c:otherwise>---</c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="info-label">Chữ ký điện tử</span>
+                            <div class="info-value">
+                                <c:choose>
+                                    <c:when test="${not empty order.signature}">
+                                        <c:set var="signatureLength" value="${fn:length(order.signature)}" />
+                                        <code class="pki-code">
+                                            <c:choose>
+                                                <c:when test="${signatureLength > 18}">
+                                                    ${fn:substring(order.signature, 0, 10)}...${fn:substring(order.signature, signatureLength - 6, signatureLength)}
+                                                </c:when>
+                                                <c:otherwise>${order.signature}</c:otherwise>
+                                            </c:choose>
+                                        </code>
+                                    </c:when>
+                                    <c:otherwise>Chưa có chữ ký</c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>
