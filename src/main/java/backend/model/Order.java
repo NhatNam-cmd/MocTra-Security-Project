@@ -26,6 +26,7 @@ public class Order {
     private String signature;
     private Integer publicKeyId;
     private boolean isTampered;
+    private boolean keyWarning;
     private String fullAddress;
     public Order() {}
 
@@ -76,6 +77,8 @@ public class Order {
     public void setPublicKeyId(Integer publicKeyId) { this.publicKeyId = publicKeyId; }
     public boolean isTampered() { return isTampered; }
     public void setTampered(boolean tampered) { isTampered = tampered; }
+    public boolean isKeyWarning() { return keyWarning; }
+    public void setKeyWarning(boolean keyWarning) { this.keyWarning = keyWarning; }
     public String getFullAddress() { return fullAddress; }
     public void setFullAddress(String fullAddress) { this.fullAddress = fullAddress; }
 }

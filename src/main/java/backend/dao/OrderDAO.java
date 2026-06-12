@@ -15,6 +15,65 @@ import java.util.List;
 public class OrderDAO {
 
 
+    public String buildOrderAuditData(Order order) {
+        StringBuilder dataToHash = new StringBuilder();
+        dataToHash.append(order.getOrderNumber()).append("|")
+                .append(order.getUserId()).append("|")
+                .append(order.getShippingAddressId() != null ? order.getShippingAddressId() : 0).append("|")
+                .append(String.valueOf(order.getNotes())).append("|")
+                .append(order.getShippingFee()).append("|")
+                .append(order.getTotalAmount()).append("|")
+                .append(String.valueOf(order.getPaymentMethod()));
+
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                dataToHash.append("|")
+                        .append(item.getProductId()).append(":")
+                        .append(item.getQuantity());
+            }
+        }
+        return dataToHash.toString();
+    }
+
+    public String buildOrderAuditDataById(int orderId) {
+        Order order = getRawOrderForAudit(orderId);
+        return order == null ? null : buildOrderAuditData(order);
+    }
+
+    private Order getRawOrderForAudit(int orderId) {
+        String sql = "SELECT id, user_id, shipping_address_id, order_number, total_amount, " +
+                "shipping_fee, payment_method, notes FROM orders WHERE id = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+
+                int shippingAddressId = rs.getInt("shipping_address_id");
+                if (!rs.wasNull()) {
+                    order.setShippingAddressId(shippingAddressId);
+                }
+
+                order.setOrderNumber(rs.getString("order_number"));
+                order.setTotalAmount(rs.getDouble("total_amount"));
+                order.setShippingFee(rs.getDouble("shipping_fee"));
+                order.setPaymentMethod(rs.getString("payment_method"));
+                order.setNotes(rs.getString("notes"));
+                order.setItems(getOrderItems(orderId));
+                return order;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> list = new ArrayList<>();
 

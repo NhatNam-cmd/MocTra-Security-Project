@@ -1,8 +1,11 @@
 package backend.controller.admin;
 
 import backend.dao.OrderDAO;
+import backend.dao.UserKeyDAO;
 import backend.model.Order;
+import backend.model.UserKey;
 import backend.model.enums.OrderStatus;
+import backend.security.SecurityUtils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,6 +19,7 @@ import java.util.List;
 public class AdminOrderServlet extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();
+    private final UserKeyDAO userKeyDAO = new UserKeyDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -25,6 +29,7 @@ public class AdminOrderServlet extends HttpServlet {
             String idStr = request.getParameter("id");
             if (idStr != null) {
                 Order order = orderDAO.getOrderById(Integer.parseInt(idStr));
+                auditOrder(order);
                 request.setAttribute("order", order);
                 request.getRequestDispatcher("/admin/admin-order-detail.jsp").forward(request, response);
             } else {
@@ -42,6 +47,9 @@ public class AdminOrderServlet extends HttpServlet {
 
 
             List<Order> list = orderDAO.getAllOrders(page, 10, status, timeFilter, sort);
+            for (Order order : list) {
+                auditOrder(order);
+            }
             int totalOrders = orderDAO.countAllOrders(status, timeFilter);
             int totalPages = (int) Math.ceil((double)totalOrders / 10);
 
@@ -86,5 +94,55 @@ public class AdminOrderServlet extends HttpServlet {
             e.printStackTrace();
             response.setStatus(500);
         }
+    }
+
+    private void auditOrder(Order order) {
+        if (order == null || order.getPublicKeyId() == null || isBlank(order.getSignature())) {
+            return;
+        }
+
+        UserKey key = userKeyDAO.getKeyById(order.getPublicKeyId());
+        if (key == null || isBlank(key.getPublicKeyContent())) {
+            markOrderTampered(order);
+            return;
+        }
+
+        try {
+            String auditData = orderDAO.buildOrderAuditDataById(order.getId());
+            if (auditData == null) {
+                markOrderTampered(order);
+                return;
+            }
+
+            String currentHash = SecurityUtils.hashOrderData(auditData);
+            boolean validSignature = SecurityUtils.verifyDSASignature(
+                    currentHash,
+                    order.getSignature(),
+                    key.getPublicKeyContent()
+            );
+
+            if (!validSignature) {
+                markOrderTampered(order);
+            }
+
+            if ("REVOKED".equals(key.getStatus())
+                    && key.getRevokedAt() != null
+                    && order.getCreatedAt() != null
+                    && order.getCreatedAt().toLocalDateTime().isAfter(key.getRevokedAt())) {
+                order.setKeyWarning(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            markOrderTampered(order);
+        }
+    }
+
+    private void markOrderTampered(Order order) {
+        order.setTampered(true);
+        orderDAO.markOrderAsTampered(order.getId());
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }
