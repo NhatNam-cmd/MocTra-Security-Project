@@ -15,6 +15,65 @@ import java.util.List;
 public class OrderDAO {
 
 
+    public String buildOrderAuditData(Order order) {
+        StringBuilder dataToHash = new StringBuilder();
+        dataToHash.append(order.getOrderNumber()).append("|")
+                .append(order.getUserId()).append("|")
+                .append(order.getShippingAddressId() != null ? order.getShippingAddressId() : 0).append("|")
+                .append(String.valueOf(order.getNotes())).append("|")
+                .append(order.getShippingFee()).append("|")
+                .append(order.getTotalAmount()).append("|")
+                .append(String.valueOf(order.getPaymentMethod()));
+
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                dataToHash.append("|")
+                        .append(item.getProductId()).append(":")
+                        .append(item.getQuantity());
+            }
+        }
+        return dataToHash.toString();
+    }
+
+    public String buildOrderAuditDataById(int orderId) {
+        Order order = getRawOrderForAudit(orderId);
+        return order == null ? null : buildOrderAuditData(order);
+    }
+
+    private Order getRawOrderForAudit(int orderId) {
+        String sql = "SELECT id, user_id, shipping_address_id, order_number, total_amount, " +
+                "shipping_fee, payment_method, notes FROM orders WHERE id = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+
+                int shippingAddressId = rs.getInt("shipping_address_id");
+                if (!rs.wasNull()) {
+                    order.setShippingAddressId(shippingAddressId);
+                }
+
+                order.setOrderNumber(rs.getString("order_number"));
+                order.setTotalAmount(rs.getDouble("total_amount"));
+                order.setShippingFee(rs.getDouble("shipping_fee"));
+                order.setPaymentMethod(rs.getString("payment_method"));
+                order.setNotes(rs.getString("notes"));
+                order.setItems(getOrderItems(orderId));
+                return order;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> list = new ArrayList<>();
 
@@ -80,12 +139,19 @@ public class OrderDAO {
 
                     String fullAddr = String.format("<strong>%s - %s</strong><br>%s, %s, %s",
                             fullName, phone, street, ward, province);
-                    o.setNotes(fullAddr);
+                    o.setFullAddress(fullAddr);
                 } else {
-                    o.setNotes("Địa chỉ đã bị xóa hoặc không tồn tại.");
+                    o.setFullAddress("Địa chỉ đã bị xóa hoặc không tồn tại.");
                 }
 
-
+                o.setNotes(rs.getString("notes"));
+                try { o.setOrderHash(rs.getString("order_hash")); } catch (Exception e) {}
+                try { o.setSignature(rs.getString("signature")); } catch (Exception e) {}
+                try {
+                    int pkId = rs.getInt("public_key_id");
+                    if (!rs.wasNull()) o.setPublicKeyId(pkId);
+                } catch (Exception e) {}
+                try { o.setTampered(rs.getBoolean("is_tampered")); } catch (Exception e) {}
                 o.setItems(getOrderItems(o.getId()));
 
                 list.add(o);
@@ -98,32 +164,26 @@ public class OrderDAO {
 
 
     public int createOrder(Order order) {
-        String sql = "INSERT INTO orders (user_id, shipping_address_id, order_number, status, total_amount, shipping_fee, payment_method, payment_status, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO orders (user_id, shipping_address_id, order_number, status, total_amount, shipping_fee, payment_method, payment_status, notes, order_hash, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, order.getUserId());
-
             if (order.getShippingAddressId() != null) {
                 ps.setInt(2, order.getShippingAddressId());
             } else {
                 ps.setNull(2, Types.INTEGER);
             }
-
             ps.setString(3, order.getOrderNumber());
-
-
             ps.setString(4, OrderStatus.PENDING.name().toLowerCase());
-
             ps.setDouble(5, order.getTotalAmount());
             ps.setDouble(6, order.getShippingFee());
             ps.setString(7, order.getPaymentMethod());
-
-
             ps.setString(8, PaymentStatus.PENDING.name().toLowerCase());
-
             ps.setString(9, order.getNotes());
+
+            ps.setString(10, order.getOrderHash());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -166,10 +226,7 @@ public class OrderDAO {
 
     private List<OrderItem> getOrderItems(int orderId) {
         List<OrderItem> items = new ArrayList<>();
-        String sql = "SELECT oi.*, p.name, p.image_url " +
-                "FROM order_items oi " +
-                "JOIN products p ON oi.product_id = p.id " +
-                "WHERE oi.order_id = ?";
+        String sql = "SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ? ORDER BY oi.id ASC";
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -244,6 +301,14 @@ public class OrderDAO {
                 } else {
                     o.setNotes(rs.getString("notes"));
                 }
+                try { o.setOrderHash(rs.getString("order_hash")); } catch (Exception e) {}
+                try { o.setSignature(rs.getString("signature")); } catch (Exception e) {}
+                try {
+                    int pkId = rs.getInt("public_key_id");
+                    if (!rs.wasNull()) o.setPublicKeyId(pkId);
+                } catch (Exception e) {}
+                try { o.setTampered(rs.getBoolean("is_tampered")); } catch (Exception e) {}
+
                 o.setItems(getOrderItems(o.getId()));
             }
         } catch (SQLException e) {
@@ -370,6 +435,13 @@ public class OrderDAO {
             String customerName = rs.getString("full_name");
             if (customerName != null) o.setNotes(customerName);
         } catch (Exception e) {}
+        try { o.setOrderHash(rs.getString("order_hash")); } catch (Exception e) {}
+        try { o.setSignature(rs.getString("signature")); } catch (Exception e) {}
+        try {
+            int pkId = rs.getInt("public_key_id");
+            if (!rs.wasNull()) o.setPublicKeyId(pkId);
+        } catch (Exception e) {}
+        try { o.setTampered(rs.getBoolean("is_tampered")); } catch (Exception e) {}
 
         return o;
     }
@@ -393,5 +465,32 @@ public class OrderDAO {
             e.printStackTrace();
         }
         return list;
+    }
+    public boolean updateOrderSignature(int orderId, String signature, int publicKeyId) {
+        String sql = "UPDATE orders SET signature = ?, public_key_id = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, signature);
+            ps.setInt(2, publicKeyId);
+            ps.setInt(3, orderId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean markOrderAsTampered(int orderId) {
+        String sql = "UPDATE orders SET is_tampered = 1 WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

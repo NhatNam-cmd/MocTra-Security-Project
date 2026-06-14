@@ -16,8 +16,7 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         if(request.getSession().getAttribute("user") != null){
-            response.sendRedirect("index.jsp");
-            return;
+            response.sendRedirect(request.getContextPath() + "/index.jsp");            return;
         }
         String googleLoginUrl = backend.controller.GoogleUtils.getGoogleAuthUrl();
         request.setAttribute("googleUrl", googleLoginUrl);
@@ -48,9 +47,9 @@ public class LoginServlet extends HttpServlet {
             Cart userCartFromDB = cartDAO.getCartByUserId(account.getId());
             session.setAttribute("cart", userCartFromDB);
             if(account.getRole() != null && account.getRole().name().equalsIgnoreCase("ADMIN")){
-                response.sendRedirect("admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
-                response.sendRedirect("/index");
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
         } else {
             request.setAttribute("errorMessage", "Sai tên đăng nhập hoặc mật khẩu!");

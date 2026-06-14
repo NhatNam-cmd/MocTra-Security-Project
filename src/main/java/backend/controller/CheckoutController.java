@@ -9,6 +9,8 @@ import backend.model.CartItem;
 import backend.model.User;
 import backend.model.UserAddress;
 import backend.model.Order;
+import backend.model.OrderItem;
+import backend.security.SecurityUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "CheckoutServlet", value = "/thanh-toan")
-public class CheckoutServlet extends HttpServlet {
+public class CheckoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -115,8 +117,29 @@ public class CheckoutServlet extends HttpServlet {
         order.setPaymentMethod(paymentMethod);
         order.setNotes(note);
 
-
         OrderDAO orderDAO = new OrderDAO();
+        try {
+            List<OrderItem> auditItems = new ArrayList<>();
+            for (CartItem item : cart.getItems()) {
+                OrderItem auditItem = new OrderItem();
+                auditItem.setProductId(item.getProduct().getId());
+                auditItem.setQuantity(item.getQuantity());
+                auditItems.add(auditItem);
+            }
+            order.setItems(auditItems);
+            String auditData = orderDAO.buildOrderAuditData(order);
+            System.out.println("=== CHUỖI GỐC LÚC CHECKOUT ===");
+            System.out.println(auditData);
+            String orderHash = SecurityUtils.hashOrderData(auditData);
+            order.setOrderHash(orderHash);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Hệ thống gặp lỗi bảo mật khi khởi tạo dữ liệu đơn hàng. Vui lòng thử lại!");
+            doGet(request, response);
+            return;
+        }
+
         int orderId = orderDAO.createOrder(order);
 
         if (orderId > 0) {

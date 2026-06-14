@@ -38,7 +38,14 @@
                 <a href="don-hang"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng của tôi</a>
             </li>
 
-
+            <li class="${param.activePage == 'key' ? 'active' : ''}">
+                <a href="key"><i class="fa-solid fa-key"></i> Quản lý khóa</a>
+            </li>
+            <li class="${param.activePage == 'huong-dan-bao-mat' ? 'active' : ''}">
+                <a href="huong-dan-bao-mat.jsp">
+                    <i class="fa-solid fa-book-shield"></i> Hướng dẫn bảo mật
+                </a>
+            </li>
             <li>
                 <a href="logout" style="color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
             </li>

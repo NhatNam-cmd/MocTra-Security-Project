@@ -22,6 +22,12 @@ public class Order {
     private String notes;
     private Timestamp createdAt;
     private List<OrderItem> items = new ArrayList<>();
+    private String orderHash;
+    private String signature;
+    private Integer publicKeyId;
+    private boolean isTampered;
+    private boolean keyWarning;
+    private String fullAddress;
     public Order() {}
 
     public int getId() { return id; }
@@ -62,4 +68,17 @@ public class Order {
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
+
+    public String getOrderHash() { return orderHash; }
+    public void setOrderHash(String orderHash) { this.orderHash = orderHash; }
+    public String getSignature() { return signature; }
+    public void setSignature(String signature) { this.signature = signature; }
+    public Integer getPublicKeyId() { return publicKeyId; }
+    public void setPublicKeyId(Integer publicKeyId) { this.publicKeyId = publicKeyId; }
+    public boolean isTampered() { return isTampered; }
+    public void setTampered(boolean tampered) { isTampered = tampered; }
+    public boolean isKeyWarning() { return keyWarning; }
+    public void setKeyWarning(boolean keyWarning) { this.keyWarning = keyWarning; }
+    public String getFullAddress() { return fullAddress; }
+    public void setFullAddress(String fullAddress) { this.fullAddress = fullAddress; }
 }
