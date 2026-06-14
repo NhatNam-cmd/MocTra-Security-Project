@@ -4,21 +4,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-public class SignatureTool extends JFrame {
+public class ToolView extends JFrame {
 
-    private JTextField txtKeyPath;
-    private JTextArea txtHash;
-    private JTextArea txtSignature;
+    JTextField txtKeyPath;
+    JTextArea txtHash;
+    JTextArea txtSignature;
     JButton btnBrowse;
     JButton btnSign;
     JButton btnCopy;
     JLabel lblStatus;
 
-    public static void main(String[] args) {
-        new SignatureTool();
-    }
-
-    public SignatureTool() {
+    public ToolView() {
         setTitle("Tool Chữ ký số");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(900, 520);

@@ -10,7 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-
+import backend.dao.UserKeyDAO;
+import backend.model.UserKey;
 @WebServlet(name = "InvoiceServlet", value = "/hoa-don")
 public class InvoiceServlet extends HttpServlet {
     @Override
@@ -36,6 +37,10 @@ public class InvoiceServlet extends HttpServlet {
 
 
             if (order != null && order.getUserId() == user.getId()) {
+                UserKeyDAO userKeyDAO = new UserKeyDAO();
+                UserKey activeKey = userKeyDAO.getActivePublicKeyByUserId(user.getId());
+                boolean hasActiveKey = (activeKey != null);
+                request.setAttribute("hasActiveKey", hasActiveKey);
                 request.setAttribute("order", order);
                 request.getRequestDispatcher("hoa-don.jsp").forward(request, response);
             } else {
