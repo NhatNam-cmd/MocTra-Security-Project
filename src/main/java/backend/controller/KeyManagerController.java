@@ -156,21 +156,26 @@ public class KeyManagerController extends HttpServlet {
     private void downloadPrivateKey(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        String privateKeyData = request.getSession().getAttribute("newPrivateKey").toString();
+        HttpSession session = request.getSession(false);
+        Object keyAttr = (session != null) ? session.getAttribute("newPrivateKey") : null;
 
-        request.getSession().removeAttribute("newPrivateKey");
-        if (privateKeyData == null || privateKeyData.trim().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Không có private key để tải về");
+        if (session != null) {
+            session.removeAttribute("newPrivateKey");
+        }
+
+        if (keyAttr == null || keyAttr.toString().trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/key");
             return;
         }
+
+        String privateKeyData = keyAttr.toString().trim();
 
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition",
                 "attachment; filename=\"" + PRIVATE_KEY_FILENAME + "\"");
 
         PrintWriter writer = response.getWriter();
-        writer.write(formatPrivateKeyPEM(privateKeyData.trim()));
+        writer.write(formatPrivateKeyPEM(privateKeyData));
         writer.flush();
     }
 

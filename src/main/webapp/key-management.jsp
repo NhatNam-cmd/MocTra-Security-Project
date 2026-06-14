@@ -1,10 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%-- Consume flash message from session (set after redirect) --%>
 <c:if test="${not empty sessionScope.flashSuccess}">
     <c:set var="flashSuccess" value="${sessionScope.flashSuccess}"/>
     <% session.removeAttribute("flashSuccess"); %>
+</c:if>
+
+<c:if test="${not empty sessionScope.newPrivateKey}">
+    <c:set var="newPrivateKey" scope="page" value="${sessionScope.newPrivateKey}"/>
 </c:if>
 
 <!DOCTYPE html>
@@ -408,6 +411,10 @@
             <div class="key-hint">
                 Nhấn nút bên dưới để sinh cặp khóa DSA 2048-bit mới. Public key sẽ được lưu vào
                 hệ thống, còn Private key sẽ hiển thị ngay để bạn tải về và lưu trữ an toàn.
+                <br><br>
+                <a href="huong-dan-bao-mat.jsp" style="color: #00695c; font-weight: 600; text-decoration: underline;">
+                    <i class="fa-solid fa-book-open"></i> Xem Cẩm nang hướng dẫn sử dụng Khóa & Công cụ ký
+                </a>
             </div>
 
             <form action="key" method="post">
@@ -425,18 +432,10 @@
                         Private Key — Tải về ngay
                     </div>
 
-                    <div class="private-key-box">${newPrivateKey}</div>
-
-                    <form action="key" method="get" style="display: inline;">
-<%--                        <input type="hidden" name="action" value="downloadPrivateKey"/>--%>
-<%--                        <input type="hidden" name="privateKey" value="${newPrivateKey}"/>--%>
-                        <a href="key?action=downloadPrivateKey"
-                           class="btn-download">Tải về private.key</a> .
-<%--                        <button type="submit" class="btn-download">--%>
-<%--                            <i class="fa-solid fa-download"></i>--%>
-<%--                            Tải về private.key--%>
-<%--                        </button>--%>
-                    </form>
+                    <a href="key?action=downloadPrivateKey" class="btn-download">
+                        <i class="fa-solid fa-download"></i>
+                        Tải về private.key
+                    </a>
 
                     <div class="key-alert key-alert-danger">
                         <strong><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo bảo mật:</strong>
@@ -563,39 +562,39 @@
                 <div style="border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;">
                     <table class="key-history-table">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Ngày tạo</th>
-                                <th>Trạng thái</th>
-                                <th>Ngày thu hồi</th>
-                            </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày thu hồi</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="key" items="${allKeys}">
-                                <tr>
-                                    <td><strong>#${key.id}</strong></td>
-                                    <td>${key.createdAt}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${key.status == 'ACTIVE'}">
+                        <c:forEach var="key" items="${allKeys}">
+                            <tr>
+                                <td><strong>#${key.id}</strong></td>
+                                <td>${key.createdAt}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${key.status == 'ACTIVE'}">
                                                 <span class="badge-active">
                                                     <i class="fa-solid fa-circle" style="font-size: 0.6em;"></i>
                                                     ACTIVE
                                                 </span>
-                                            </c:when>
-                                            <c:otherwise>
+                                        </c:when>
+                                        <c:otherwise>
                                                 <span class="badge-revoked">
                                                     <i class="fa-solid fa-ban" style="font-size: 0.7em;"></i>
                                                     REVOKED
                                                 </span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td style="color: #999;">
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td style="color: #999;">
                                         ${key.revokedAt != null ? key.revokedAt : '—'}
-                                    </td>
-                                </tr>
-                            </c:forEach>
+                                </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </div>
