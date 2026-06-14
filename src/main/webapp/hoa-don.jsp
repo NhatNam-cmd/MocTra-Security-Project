@@ -57,7 +57,11 @@
                                     Đơn hàng của bạn đã được khởi tạo thành công.<br>
                                     Để đảm bảo tính toàn vẹn dữ liệu, vui lòng sử dụng <strong>Công cụ CryptoApp</strong> để ký xác nhận.
                                 </p>
-
+                                <div style="margin-bottom: 25px;">
+                                    <a href="huong-dan-bao-mat.jsp" target="_blank" style="color: #00897b; text-decoration: underline; font-weight: 500; font-size: 0.95rem;">
+                                        <i class="fa-regular fa-circle-question"></i> Bạn chưa biết cách ký? Xem hướng dẫn tại đây
+                                    </a>
+                                </div>
                                 <c:if test="${not empty errorMessage}">
                                     <div class="alert alert-danger" style="background: #fdecea; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
                                         <i class="fa-solid fa-circle-xmark"></i> ${errorMessage}

@@ -1,6 +1,7 @@
 package tool;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -22,7 +23,7 @@ public class ToolModel {
         KeyFactory kf = KeyFactory.getInstance("DSA");
         PrivateKey privateKey = kf.generatePrivate(spec);
 
-        byte[] hashBytes = Base64.getDecoder().decode(hashString.trim());
+        byte[] hashBytes = hashString.trim().getBytes(StandardCharsets.UTF_8);
 
         Signature sig = Signature.getInstance("SHA256withDSA");
         sig.initSign(privateKey);
