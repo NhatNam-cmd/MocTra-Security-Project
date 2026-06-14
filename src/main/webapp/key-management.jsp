@@ -408,6 +408,10 @@
             <div class="key-hint">
                 Nhấn nút bên dưới để sinh cặp khóa DSA 2048-bit mới. Public key sẽ được lưu vào
                 hệ thống, còn Private key sẽ hiển thị ngay để bạn tải về và lưu trữ an toàn.
+                <br><br>
+                <a href="huong-dan-bao-mat.jsp" style="color: #00695c; font-weight: 600; text-decoration: underline;">
+                    <i class="fa-solid fa-book-open"></i> Xem Cẩm nang hướng dẫn sử dụng Khóa & Công cụ ký
+                </a>
             </div>
 
             <form action="key" method="post">
