@@ -29,7 +29,8 @@ public class OrderDAO {
             for (OrderItem item : order.getItems()) {
                 dataToHash.append("|")
                         .append(item.getProductId()).append(":")
-                        .append(item.getQuantity());
+                        .append(item.getQuantity()).append(":")
+                        .append(item.getPrice());
             }
         }
         return dataToHash.toString();

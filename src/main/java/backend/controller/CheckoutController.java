@@ -124,6 +124,10 @@ public class CheckoutController extends HttpServlet {
                 OrderItem auditItem = new OrderItem();
                 auditItem.setProductId(item.getProduct().getId());
                 auditItem.setQuantity(item.getQuantity());
+                double finalPrice = item.getProduct().getSalePrice() > 0 ?
+                        item.getProduct().getSalePrice() :
+                        item.getProduct().getPrice();
+                auditItem.setPrice(finalPrice);
                 auditItems.add(auditItem);
             }
             order.setItems(auditItems);
