@@ -187,15 +187,29 @@ public class KeyManagerController extends HttpServlet {
         }
 
         UserKey userKey = new UserKey(userId, cleaned);
-        boolean saved = userKeyDAO.savePublicKey(userKey);
-
-        if (saved) {
-            setKeyPageAttributes(request, userId);
-            request.setAttribute("successMessage", "Tải lên Public Key thành công!");
-            request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
-        } else {
-            forwardWithError(request, response, userId, "Lỗi khi lưu Public Key vào hệ thống.");
+        List<UserKey> keys = userKeyDAO.getAllKeysByUserId(userId);
+        boolean isKeyRevolked = false;
+        for (UserKey key : keys) {
+            if (!key.isActive() && key.getPublicKeyContent().equals(cleaned)) {
+                isKeyRevolked = true;
+            }
         }
+        boolean saved = false;
+        if (isKeyRevolked) {
+            forwardWithError(request, response, userId, "Lỗi key đã được thu hồi, không thể thêm lại.");
+        }
+        else {
+            saved = userKeyDAO.savePublicKey(userKey);
+            if (saved) {
+                setKeyPageAttributes(request, userId);
+                request.setAttribute("successMessage", "Tải lên Public Key thành công!");
+                request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
+            } else {
+                forwardWithError(request, response, userId, "Lỗi khi lưu Public Key vào hệ thống.");
+            }
+        }
+
+
     }
 
     private void downloadPrivateKey(HttpServletRequest request, HttpServletResponse response)
