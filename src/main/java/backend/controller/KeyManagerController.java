@@ -84,7 +84,12 @@ public class KeyManagerController extends HttpServlet {
 
     private void generateAndSaveKeyPair(HttpServletRequest request, HttpServletResponse response, int userId)
             throws ServletException, IOException {
-
+        UserKey existingActive = userKeyDAO.getActivePublicKeyByUserId(userId);
+        if (existingActive != null) {
+            forwardWithError(request, response, userId,
+                    "Bạn đang có khóa hoạt động. Vui lòng thu hồi khóa hiện tại trước khi tạo khóa mới.");
+            return;
+        }
         try {
             HttpSession session = request.getSession();
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
@@ -101,10 +106,9 @@ public class KeyManagerController extends HttpServlet {
             boolean saved   = userKeyDAO.savePublicKey(userKey);
 
             if (saved) {
-                setKeyPageAttributes(request, userId);
                 session.setAttribute("newPrivateKey", privateKeyBase64);
-                request.setAttribute("successMessage", "Tạo cặp khóa thành công! Hãy tải về private.key ngay.");
-                request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
+                session.setAttribute("flashSuccess", "Tạo cặp khóa thành công! Hãy tải về private.key ngay.");
+                response.sendRedirect(request.getContextPath() + "/key");
             } else {
                 forwardWithError(request, response, userId, "Lỗi khi lưu public key vào database");
             }
