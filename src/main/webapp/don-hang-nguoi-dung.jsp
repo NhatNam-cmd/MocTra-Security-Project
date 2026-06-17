@@ -95,6 +95,12 @@
                                 <strong>CẢNH BÁO BẢO MẬT:</strong> Dữ liệu của đơn hàng này đã bị can thiệp trái phép hoặc chữ ký không hợp lệ! Vui lòng chụp màn hình và liên hệ Admin ngay lập tức.
                             </div>
                         </c:if>
+                        <c:if test="${revokedWarningMap[o.id]}">
+                            <div style="background: #fff3e0; color: #e65100; padding: 15px 20px; border-bottom: 1px solid #ffe0b2; font-size: 0.95em;">
+                                <i class="fa-solid fa-shield-halved" style="font-size: 1.2em; margin-right: 8px;"></i>
+                                <strong>CẢNH BÁO AN TOÀN:</strong> Đơn hàng này được tạo bằng một khóa bảo mật đã bị thu hồi. Vui lòng liên hệ admin để xử lý.
+                            </div>
+                        </c:if>
                         <div class="order-card-body">
                             <div class="order-items">
                                 <c:forEach var="item" items="${o.items}">
