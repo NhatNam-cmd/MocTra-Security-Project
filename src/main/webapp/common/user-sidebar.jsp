@@ -43,7 +43,7 @@
             </li>
             <li class="${param.activePage == 'huong-dan-bao-mat' ? 'active' : ''}">
                 <a href="huong-dan-bao-mat.jsp">
-                    <i class="fa-solid fa-book-shield"></i> Hướng dẫn bảo mật
+                    <i class="fa-solid fa-file-shield"></i> Hướng dẫn bảo mật
                 </a>
             </li>
             <li>
