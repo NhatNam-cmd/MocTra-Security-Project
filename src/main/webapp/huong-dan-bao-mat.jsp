@@ -83,7 +83,7 @@
     <div class="download-card">
         <h2 style="color: #2e7d32; margin-bottom: 15px;">Công cụ Ký số CryptoApp</h2>
         <p style="color: #555; margin-bottom: 20px;">Bạn cần tải công cụ này về máy tính để tạo chữ ký cho đơn hàng. Công cụ hoàn toàn an toàn, chạy trực tiếp không cần cài đặt.</p>
-        <a href="https://github.com/NhatNam-cmd/sign-tool-tea-web/releases/download/v1.0.0/SignApp_v1.1.exe" class="btn-download-tool">
+        <a href="https://github.com/NhatNam-cmd/sign-tool-tea-web/releases/download/v1.0.0/CryptoApp_v1.1.exe" class="btn-download-tool">
             <i class="fa-brands fa-windows"></i> Tải CryptoApp cho Windows (.exe)
         </a>
     </div>
