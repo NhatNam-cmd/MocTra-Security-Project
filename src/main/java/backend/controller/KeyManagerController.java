@@ -55,7 +55,9 @@ public class KeyManagerController extends HttpServlet {
 
         if ("generateKey".equals(action)) {
             generateAndSaveKeyPair(request, response, user.getId());
-        } else if ("reportLostKey".equals(action)) {
+        } else if ("uploadPublicKey".equals(action)) {
+            uploadPublicKey(request, response, user.getId());
+        }  else if ("reportLostKey".equals(action)) {
             reportLostKey(request, response, user.getId());
         } else {
             forwardWithError(request, response, user.getId(), "Action không hợp lệ");
@@ -82,7 +84,12 @@ public class KeyManagerController extends HttpServlet {
 
     private void generateAndSaveKeyPair(HttpServletRequest request, HttpServletResponse response, int userId)
             throws ServletException, IOException {
-
+        UserKey existingActive = userKeyDAO.getActivePublicKeyByUserId(userId);
+        if (existingActive != null) {
+            forwardWithError(request, response, userId,
+                    "Bạn đang có khóa hoạt động. Vui lòng thu hồi khóa hiện tại trước khi tạo khóa mới.");
+            return;
+        }
         try {
             HttpSession session = request.getSession();
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
@@ -99,10 +106,9 @@ public class KeyManagerController extends HttpServlet {
             boolean saved   = userKeyDAO.savePublicKey(userKey);
 
             if (saved) {
-                setKeyPageAttributes(request, userId);
                 session.setAttribute("newPrivateKey", privateKeyBase64);
-                request.setAttribute("successMessage", "Tạo cặp khóa thành công! Hãy tải về private.key ngay.");
-                request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
+                session.setAttribute("flashSuccess", "Tạo cặp khóa thành công! Hãy tải về private.key ngay.");
+                response.sendRedirect(request.getContextPath() + "/key");
             } else {
                 forwardWithError(request, response, userId, "Lỗi khi lưu public key vào database");
             }
@@ -146,11 +152,69 @@ public class KeyManagerController extends HttpServlet {
 
         if (revoked) {
             HttpSession session = request.getSession();
+            session.removeAttribute("newPrivateKey");
             session.setAttribute("flashSuccess", "Khóa đã được thu hồi và vô hiệu hóa thành công!");
             response.sendRedirect(request.getContextPath() + "/key");
         } else {
             forwardWithError(request, response, userId, "Lỗi khi thu hồi khóa");
         }
+    }
+
+    public void uploadPublicKey(HttpServletRequest request, HttpServletResponse response, int userId)
+            throws ServletException, IOException {
+
+        UserKey existingActive = userKeyDAO.getActivePublicKeyByUserId(userId);
+        if (existingActive != null) {
+            forwardWithError(request, response, userId,
+                    "Bạn đang có khóa đang hoạt động (Khóa #" + existingActive.getId() + "). " +
+                            "Vui lòng thu hồi khóa hiện tại trước khi tải lên khóa mới.");
+            return;
+        }
+
+        String publicKeyContent = request.getParameter("publicKeyContent");
+
+        if (publicKeyContent == null || publicKeyContent.trim().isEmpty()) {
+            forwardWithError(request, response, userId, "Nội dung Public Key không được để trống.");
+            return;
+        }
+        String cleaned = publicKeyContent
+                .replaceAll("-----BEGIN PUBLIC KEY-----|-----END PUBLIC KEY-----|\\s+", "")
+                .trim();
+
+        if (cleaned.isEmpty()) {
+            forwardWithError(request, response, userId, "Public Key không hợp lệ sau khi làm sạch dữ liệu.");
+            return;
+        }
+        if (!cleaned.matches("[A-Za-z0-9+/=]+")) {
+            forwardWithError(request, response, userId,
+                    "Public Key chứa ký tự không hợp lệ. Vui lòng kiểm tra lại nội dung.");
+            return;
+        }
+
+        UserKey userKey = new UserKey(userId, cleaned);
+        List<UserKey> keys = userKeyDAO.getAllKeysByUserId(userId);
+        boolean isKeyRevolked = false;
+        for (UserKey key : keys) {
+            if (!key.isActive() && key.getPublicKeyContent().equals(cleaned)) {
+                isKeyRevolked = true;
+            }
+        }
+        boolean saved = false;
+        if (isKeyRevolked) {
+            forwardWithError(request, response, userId, "Lỗi key đã được thu hồi, không thể thêm lại.");
+        }
+        else {
+            saved = userKeyDAO.savePublicKey(userKey);
+            if (saved) {
+                setKeyPageAttributes(request, userId);
+                request.setAttribute("successMessage", "Tải lên Public Key thành công!");
+                request.getRequestDispatcher(KEY_MANAGEMENT_JSP).forward(request, response);
+            } else {
+                forwardWithError(request, response, userId, "Lỗi khi lưu Public Key vào hệ thống.");
+            }
+        }
+
+
     }
 
     private void downloadPrivateKey(HttpServletRequest request, HttpServletResponse response)

@@ -355,6 +355,118 @@
             display: block;
             color: #b2dfdb;
         }
+
+        .upload-key-box {
+            border: 1px dashed #b2dfdb;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fafefe;
+        }
+
+        .upload-key-box .form-label {
+            display: block;
+            font-size: 0.88em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .upload-key-box textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 0.82em;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 14px;
+            resize: vertical;
+            min-height: 110px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        .upload-key-box textarea:focus {
+            outline: none;
+            border-color: #00897b;
+        }
+
+        .upload-key-box input[type="file"] {
+            display: block;
+            font-size: 0.87em;
+            color: #444;
+            margin-bottom: 14px;
+        }
+
+        .upload-key-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 0 14px;
+            color: #aaa;
+            font-size: 0.82em;
+        }
+
+        .upload-key-divider::before,
+        .upload-key-divider::after {
+            content: '';
+            flex: 1;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .section-locked {
+            position: relative;
+        }
+
+        .section-locked-overlay {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 0.88em;
+            color: #5d4037;
+            line-height: 1.6;
+        }
+
+        .section-locked-overlay i {
+            color: #f9a825;
+            font-size: 1.1em;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .tab-toggle {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border: 1px solid #b2dfdb;
+            border-radius: 8px;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .tab-toggle button {
+            padding: 9px 22px;
+            font-size: 0.88em;
+            font-weight: 600;
+            border: none;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .tab-toggle button.active {
+            background: #00897b;
+            color: #fff;
+        }
+
+        .tab-toggle button:first-child {
+            border-right: 1px solid #b2dfdb;
+        }
     </style>
 </head>
 <body class="user-dashboard-page">
@@ -385,45 +497,120 @@
             <div class="key-alert key-alert-danger">
                 <i class="fa-solid fa-circle-xmark"></i> ${errorMessage}
             </div>
+            <c:remove var="errorMessage" scope="session" />
         </c:if>
 
-        <div class="key-stats">
-            <div class="key-stat-card">
-                <div class="stat-number">${keyCount > 0 ? keyCount : 0}</div>
-                <div class="stat-label">Tổng khóa</div>
-            </div>
-            <div class="key-stat-card">
-                <div class="stat-number">${activeKey != null ? 1 : 0}</div>
-                <div class="stat-label">Đang hoạt động</div>
-            </div>
-            <div class="key-stat-card">
-                <div class="stat-number">DSA</div>
-                <div class="stat-label">2048-bit</div>
-            </div>
-        </div>
+<%--        <div class="key-stats">--%>
+<%--            <div class="key-stat-card">--%>
+<%--                <div class="stat-number">${keyCount > 0 ? keyCount : 0}</div>--%>
+<%--                <div class="stat-label">Tổng khóa</div>--%>
+<%--            </div>--%>
+<%--            <div class="key-stat-card">--%>
+<%--                <div class="stat-number">${activeKey != null ? 1 : 0}</div>--%>
+<%--                <div class="stat-label">Đang hoạt động</div>--%>
+<%--            </div>--%>
+<%--            <div class="key-stat-card">--%>
+<%--                <div class="stat-number">DSA</div>--%>
+<%--                <div class="stat-label">2048-bit</div>--%>
+<%--            </div>--%>
+<%--        </div>--%>
 
         <div class="key-section">
             <div class="key-section-title">
                 <i class="fa-solid fa-key"></i>
-                Tạo cặp khóa mới
+                Thêm khóa công khai
             </div>
 
-            <div class="key-hint">
-                Nhấn nút bên dưới để sinh cặp khóa DSA 2048-bit mới. Public key sẽ được lưu vào
-                hệ thống, còn Private key sẽ hiển thị ngay để bạn tải về và lưu trữ an toàn.
-                <br><br>
-                <a href="huong-dan-bao-mat.jsp" style="color: #00695c; font-weight: 600; text-decoration: underline;">
-                    <i class="fa-solid fa-book-open"></i> Xem Cẩm nang hướng dẫn sử dụng Khóa & Công cụ ký
-                </a>
-            </div>
+            <c:choose>
+                <c:when test="${activeKey != null}">
+                    <div class="key-hint">
+                        <a href="huong-dan-bao-mat.jsp" style="color: #00695c; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 6px;">
+                            <i class="fa-solid fa-book-open"></i> Xem Cẩm nang hướng dẫn sử dụng Khóa &amp; Công cụ ký
+                        </a>
+                    </div>
+                    <div class="section-locked-overlay">
+                        <i class="fa-solid fa-lock"></i>
+                        <div>
+                            Bạn đang có <strong>Khóa #${activeKey.id}</strong> đang hoạt động.
+                            Để tạo cặp khóa mới hoặc tải lên khóa công khai, vui lòng
+                            <strong>thu hồi khóa hiện tại</strong> trước.
+                        </div>
+                    </div>
+                </c:when>
 
-            <form action="key" method="post">
-                <input type="hidden" name="action" value="generateKey"/>
-                <button type="submit" class="btn-primary-teal">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    Tạo cặp khóa mới
-                </button>
-            </form>
+                <c:otherwise>
+                    <div class="key-hint">
+                        Bạn chưa có khóa đang hoạt động. Chọn một trong hai cách bên dưới để thêm khóa công khai.
+                        <br>
+                        <a href="huong-dan-bao-mat.jsp" style="color: #00695c; font-weight: 600; text-decoration: underline; display: inline-block; margin-top: 6px;">
+                            <i class="fa-solid fa-book-open"></i> Xem Cẩm nang hướng dẫn sử dụng Khóa &amp; Công cụ ký
+                        </a>
+                    </div>
+
+                    <div class="tab-toggle">
+                        <button id="tabGenerate" class="active" onclick="switchTab('generate')">
+                            <i class="fa-solid fa-circle-plus"></i> Tạo cặp khóa mới
+                        </button>
+                        <button id="tabUpload" onclick="switchTab('upload')">
+                            <i class="fa-solid fa-upload"></i> Tải lên Public Key
+                        </button>
+                    </div>
+
+                    <div id="panelGenerate">
+                        <div class="key-hint" style="margin-bottom: 14px;">
+                            Hệ thống sẽ sinh cặp khóa <strong>DSA 2048-bit</strong> cho bạn.
+                            Public key được lưu vào hệ thống; Private key sẽ <strong>không được chúng tôi lưu</strong> và chỉ để bạn tải về.
+                        </div>
+                        <form action="key" method="post">
+                            <input type="hidden" name="action" value="generateKey"/>
+                            <button type="submit" class="btn-primary-teal">
+                                <i class="fa-solid fa-circle-plus"></i>
+                                Tạo cặp khóa mới
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="panelUpload" style="display: none;">
+                        <div class="key-hint" style="margin-bottom: 14px;">
+                            Dán nội dung Public Key vào ô bên dưới,
+                            hoặc chọn file <code>.key</code>từ máy tính.
+                        </div>
+                        <form action="key" method="post" id="uploadKeyForm">
+                            <input type="hidden" name="action" value="uploadPublicKey"/>
+
+                            <div class="upload-key-box">
+                                <label class="form-label" for="publicKeyContent">
+                                    <i class="fa-solid fa-pen-to-square" style="color:#00897b;"></i>
+                                    Dán nội dung Public Key
+                                </label>
+                                <textarea id="publicKeyContent"
+                                          name="publicKeyContent"
+                                          placeholder="-----BEGIN PUBLIC KEY-----&#10;MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...&#10;-----END PUBLIC KEY-----"></textarea>
+
+                                <div class="upload-key-divider">hoặc chọn file</div>
+
+                                <label class="form-label" for="publicKeyFile">
+                                    <i class="fa-solid fa-folder-open" style="color:#00897b;"></i>
+                                    Chọn file Public Key (<code>.key</code>)
+                                </label>
+                                <input type="file" id="publicKeyFile" accept=".key"
+                                       onchange="loadKeyFile(this)"/>
+
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 4px;">
+                                    <button type="submit" class="btn-primary-teal">
+                                        <i class="fa-solid fa-upload"></i>
+                                        Lưu Public Key
+                                    </button>
+                                    <button type="button" class="btn-cancel" onclick="clearUploadForm()">
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </c:otherwise>
+            </c:choose>
 
             <c:if test="${not empty newPrivateKey}">
                 <div style="margin-top: 20px;">
@@ -437,7 +624,7 @@
                         Tải về private.key
                     </a>
 
-                    <div class="key-alert key-alert-danger">
+                    <div class="key-alert key-alert-danger" style="margin-top: 12px;">
                         <strong><i class="fa-solid fa-triangle-exclamation"></i> Cảnh báo bảo mật:</strong>
                         <ul>
                             <li>Lưu file <code>private.key</code> ở nơi an toàn, không chia sẻ cho ai</li>
@@ -488,69 +675,69 @@
             </div>
         </c:if>
 
-        <div class="key-section">
-            <div class="key-section-title">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                Báo mất / Thu hồi khóa
-            </div>
+<%--        <div class="key-section">--%>
+<%--            <div class="key-section-title">--%>
+<%--                <i class="fa-solid fa-triangle-exclamation"></i>--%>
+<%--                Báo mất / Thu hồi khóa--%>
+<%--            </div>--%>
 
-            <div class="key-hint">
-                Nếu bạn nghi ngờ Private Key bị lộ hoặc làm mất, hãy thu hồi khóa để vô hiệu hóa
-                ngay lập tức. Khóa bị thu hồi không thể dùng để ký tài liệu mới.
-            </div>
+<%--            <div class="key-hint">--%>
+<%--                Nếu bạn nghi ngờ Private Key bị lộ hoặc làm mất, hãy thu hồi khóa để vô hiệu hóa--%>
+<%--                ngay lập tức. Khóa bị thu hồi không thể dùng để ký tài liệu mới.--%>
+<%--            </div>--%>
 
-            <c:choose>
-                <c:when test="${empty allKeys}">
-                    <div class="empty-state">
-                        <i class="fa-regular fa-key"></i>
-                        <p>Không có khóa nào để quản lý. Vui lòng tạo cặp khóa mới trước.</p>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <div id="revokeBtnWrapper">
-                        <button class="btn-revoke" onclick="showRevokeForm()">
-                            <i class="fa-solid fa-ban"></i>
-                            Thu hồi khóa
-                        </button>
-                    </div>
+<%--            <c:choose>--%>
+<%--                <c:when test="${empty allKeys}">--%>
+<%--                    <div class="empty-state">--%>
+<%--                        <i class="fa-regular fa-key"></i>--%>
+<%--                        <p>Không có khóa nào để quản lý. Vui lòng tạo cặp khóa mới trước.</p>--%>
+<%--                    </div>--%>
+<%--                </c:when>--%>
+<%--                <c:otherwise>--%>
+<%--                    <div id="revokeBtnWrapper">--%>
+<%--                        <button class="btn-revoke" onclick="showRevokeForm()">--%>
+<%--                            <i class="fa-solid fa-ban"></i>--%>
+<%--                            Thu hồi khóa--%>
+<%--                        </button>--%>
+<%--                    </div>--%>
 
-                    <div id="revokeFormBox" class="revoke-form-box" style="display: none;">
-                        <form action="key" method="post"
-                              onsubmit="return confirm('Bạn có chắc muốn thu hồi khóa đã chọn?\nHành động này không thể hoàn tác!');">
-                            <input type="hidden" name="action" value="reportLostKey"/>
+<%--                    <div id="revokeFormBox" class="revoke-form-box" style="display: none;">--%>
+<%--                        <form action="key" method="post"--%>
+<%--                              onsubmit="return confirm('Bạn có chắc muốn thu hồi khóa đã chọn?\nHành động này không thể hoàn tác!');">--%>
+<%--                            <input type="hidden" name="action" value="reportLostKey"/>--%>
 
-                            <label class="form-label" for="revokeKeyId">Chọn khóa cần thu hồi</label>
-                            <select id="revokeKeyId" name="keyId" required>
-                                <option value="">-- Chọn khóa --</option>
-                                <c:forEach var="key" items="${allKeys}">
-                                    <c:if test="${key.status == 'ACTIVE'}">
-                                        <option value="${key.id}">
-                                            Khóa #${key.id} (Tạo: ${key.createdAt})
-                                        </option>
-                                    </c:if>
-                                </c:forEach>
-                            </select>
+<%--                            <label class="form-label" for="revokeKeyId">Chọn khóa cần thu hồi</label>--%>
+<%--                            <select id="revokeKeyId" name="keyId" required>--%>
+<%--                                <option value="">-- Chọn khóa --</option>--%>
+<%--                                <c:forEach var="key" items="${allKeys}">--%>
+<%--                                    <c:if test="${key.status == 'ACTIVE'}">--%>
+<%--                                        <option value="${key.id}">--%>
+<%--                                            Khóa #${key.id} (Tạo: ${key.createdAt})--%>
+<%--                                        </option>--%>
+<%--                                    </c:if>--%>
+<%--                                </c:forEach>--%>
+<%--                            </select>--%>
 
-                            <label class="form-label" for="revokeReason">Lý do thu hồi (tùy chọn)</label>
-                            <textarea id="revokeReason"
-                                      name="reason"
-                                      placeholder="Giải thích tại sao bạn thu hồi khóa này..."></textarea>
+<%--                            <label class="form-label" for="revokeReason">Lý do thu hồi (tùy chọn)</label>--%>
+<%--                            <textarea id="revokeReason"--%>
+<%--                                      name="reason"--%>
+<%--                                      placeholder="Giải thích tại sao bạn thu hồi khóa này..."></textarea>--%>
 
-                            <div class="revoke-form-actions">
-                                <button type="submit" class="btn-revoke">
-                                    <i class="fa-solid fa-check"></i>
-                                    Xác nhận thu hồi
-                                </button>
-                                <button type="button" class="btn-cancel" onclick="cancelRevoke()">
-                                    <i class="fa-solid fa-xmark"></i>
-                                    Hủy
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
+<%--                            <div class="revoke-form-actions">--%>
+<%--                                <button type="submit" class="btn-revoke">--%>
+<%--                                    <i class="fa-solid fa-check"></i>--%>
+<%--                                    Xác nhận thu hồi--%>
+<%--                                </button>--%>
+<%--                                <button type="button" class="btn-cancel" onclick="cancelRevoke()">--%>
+<%--                                    <i class="fa-solid fa-xmark"></i>--%>
+<%--                                    Hủy--%>
+<%--                                </button>--%>
+<%--                            </div>--%>
+<%--                        </form>--%>
+<%--                    </div>--%>
+<%--                </c:otherwise>--%>
+<%--            </c:choose>--%>
+<%--        </div>--%>
 
         <c:if test="${not empty allKeys}">
             <div class="key-section">
@@ -625,6 +812,29 @@
     backToTopBtn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    function switchTab(tab) {
+        var isGenerate = tab === 'generate';
+        document.getElementById('panelGenerate').style.display = isGenerate ? 'block' : 'none';
+        document.getElementById('panelUpload').style.display   = isGenerate ? 'none'  : 'block';
+        document.getElementById('tabGenerate').classList.toggle('active', isGenerate);
+        document.getElementById('tabUpload').classList.toggle('active', !isGenerate);
+    }
+
+    function loadKeyFile(input) {
+        var file = input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('publicKeyContent').value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+
+    function clearUploadForm() {
+        document.getElementById('publicKeyContent').value = '';
+        document.getElementById('publicKeyFile').value    = '';
+    }
 
     /* Revoke form toggle */
     function showRevokeForm() {

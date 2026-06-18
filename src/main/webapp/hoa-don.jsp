@@ -86,6 +86,7 @@
                                     <div class="alert alert-danger" style="background: #fdecea; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
                                         <i class="fa-solid fa-circle-xmark"></i> ${errorMessage}
                                     </div>
+                                    <c:remove var="errorMessage" scope="session" />
                                 </c:if>
 
                                 <div class="hash-box" style="background: #f5f5f5; padding: 18px; border-radius: 8px; margin-bottom: 25px; text-align: left; border: 1px solid #ddd;">
