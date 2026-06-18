@@ -497,6 +497,7 @@
             <div class="key-alert key-alert-danger">
                 <i class="fa-solid fa-circle-xmark"></i> ${errorMessage}
             </div>
+            <c:remove var="errorMessage" scope="session" />
         </c:if>
 
 <%--        <div class="key-stats">--%>

@@ -32,6 +32,7 @@ public class UserOrderServlet extends HttpServlet {
         OrderDAO orderDAO = new OrderDAO();
         UserKeyDAO keyDAO = new UserKeyDAO();
         List<Order> orders = orderDAO.getOrdersByUserId(user.getId());
+        java.util.Map<Integer, Boolean> revokedWarningMap = new java.util.HashMap<>();
         for (Order o : orders) {
             try {
                 StringBuilder dataToHash = new StringBuilder();
@@ -62,6 +63,11 @@ public class UserOrderServlet extends HttpServlet {
                         if (!isValidSig) {
                             isTampered = true;
                         }
+                        if ("REVOKED".equals(key.getStatus()) && key.getRevokedAt() != null) {
+                            if (o.getCreatedAt().toLocalDateTime().isAfter(key.getRevokedAt())) {
+                                revokedWarningMap.put(o.getId(), true);
+                            }
+                        }
                     } else {
                         isTampered = true;
                     }
@@ -75,7 +81,7 @@ public class UserOrderServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-
+        request.setAttribute("revokedWarningMap", revokedWarningMap);
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("don-hang-nguoi-dung.jsp").forward(request, response);
     }
