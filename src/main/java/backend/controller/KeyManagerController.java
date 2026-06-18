@@ -152,6 +152,7 @@ public class KeyManagerController extends HttpServlet {
 
         if (revoked) {
             HttpSession session = request.getSession();
+            session.removeAttribute("newPrivateKey");
             session.setAttribute("flashSuccess", "Khóa đã được thu hồi và vô hiệu hóa thành công!");
             response.sendRedirect(request.getContextPath() + "/key");
         } else {
