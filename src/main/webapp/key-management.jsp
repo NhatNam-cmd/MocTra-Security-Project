@@ -559,7 +559,7 @@
                     <div id="panelGenerate">
                         <div class="key-hint" style="margin-bottom: 14px;">
                             Hệ thống sẽ sinh cặp khóa <strong>DSA 2048-bit</strong> cho bạn.
-                            Public key được lưu vào hệ thống; Private key chỉ hiển thị <strong>một lần duy nhất</strong> để bạn tải về.
+                            Public key được lưu vào hệ thống; Private key sẽ <strong>không được chúng tôi lưu</strong> và chỉ để bạn tải về.
                         </div>
                         <form action="key" method="post">
                             <input type="hidden" name="action" value="generateKey"/>
