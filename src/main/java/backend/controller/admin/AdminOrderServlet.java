@@ -97,13 +97,7 @@ public class AdminOrderServlet extends HttpServlet {
     }
 
     private void auditOrder(Order order) {
-        if (order == null || order.getPublicKeyId() == null || isBlank(order.getSignature())) {
-            return;
-        }
-
-        UserKey key = userKeyDAO.getKeyById(order.getPublicKeyId());
-        if (key == null || isBlank(key.getPublicKeyContent())) {
-            markOrderTampered(order);
+        if (order == null) {
             return;
         }
 
@@ -115,6 +109,21 @@ public class AdminOrderServlet extends HttpServlet {
             }
 
             String currentHash = SecurityUtils.hashOrderData(auditData);
+            if (isBlank(order.getOrderHash()) || !currentHash.equals(order.getOrderHash())) {
+                markOrderTampered(order);
+                return;
+            }
+
+            if (order.getPublicKeyId() == null || isBlank(order.getSignature())) {
+                return;
+            }
+
+            UserKey key = userKeyDAO.getKeyById(order.getPublicKeyId());
+            if (key == null || isBlank(key.getPublicKeyContent())) {
+                markOrderTampered(order);
+                return;
+            }
+
             boolean validSignature = SecurityUtils.verifyDSASignature(
                     currentHash,
                     order.getSignature(),

@@ -4,7 +4,6 @@ import backend.dao.OrderDAO;
 import backend.model.Order;
 import backend.model.User;
 import backend.dao.UserKeyDAO;
-import backend.model.OrderItem;
 import backend.model.UserKey;
 import backend.security.SecurityUtils;
 import jakarta.servlet.ServletException;
@@ -35,23 +34,10 @@ public class UserOrderServlet extends HttpServlet {
         java.util.Map<Integer, Boolean> revokedWarningMap = new java.util.HashMap<>();
         for (Order o : orders) {
             try {
-                StringBuilder dataToHash = new StringBuilder();
-                dataToHash.append(o.getOrderNumber()).append("|")
-                        .append(o.getUserId()).append("|")
-                        .append(o.getShippingAddressId()).append("|")
-                        .append(o.getNotes()).append("|")
-                        .append(o.getShippingFee()).append("|")
-                        .append(o.getTotalAmount()).append("|")
-                        .append(o.getPaymentMethod());
-
-                for (OrderItem item : o.getItems()) {
-                    dataToHash.append("|")
-                            .append(item.getProductId()).append(":")
-                            .append(item.getQuantity());
-                }
+                String auditData = orderDAO.buildOrderAuditData(o);
                 System.out.println("=== CHUỖI LÚC TRUY XUẤT LÊN ===");
-                System.out.println(dataToHash.toString());
-                String currentHash = SecurityUtils.hashOrderData(dataToHash.toString());
+                System.out.println(auditData);
+                String currentHash = SecurityUtils.hashOrderData(auditData);
                 boolean isTampered = false;
                 if (o.getOrderHash() == null || !currentHash.equals(o.getOrderHash())) {
                     isTampered = true;
