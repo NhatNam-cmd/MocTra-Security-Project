@@ -6,6 +6,8 @@ public class OrderItem {
     private int productId;
     private int quantity;
     private double price;
+    private String productNameSnapshot;
+    private String productImageSnapshot;
     private Product product;
 
 
@@ -25,6 +27,10 @@ public class OrderItem {
 
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
+    public String getProductNameSnapshot() { return productNameSnapshot; }
+    public void setProductNameSnapshot(String productNameSnapshot) { this.productNameSnapshot = productNameSnapshot; }
+    public String getProductImageSnapshot() { return productImageSnapshot; }
+    public void setProductImageSnapshot(String productImageSnapshot) { this.productImageSnapshot = productImageSnapshot; }
     public Product getProduct() {
         return product;
     }

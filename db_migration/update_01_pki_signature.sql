@@ -24,3 +24,9 @@ ADD COLUMN `is_tampered` tinyint(1) DEFAULT 0 COMMENT '0: An toàn, 1: Bị sử
 -- 3. Thêm khóa ngoại để liên kết đơn hàng với khóa Public Key
 ALTER TABLE `orders`
     ADD CONSTRAINT `fk_order_public_key` FOREIGN KEY (`public_key_id`) REFERENCES `user_keys` (`id`) ON DELETE SET NULL;
+-- Snapshot product display data for order items.
+-- Keeps old orders stable when product name or image changes later.
+
+ALTER TABLE `order_items`
+    ADD COLUMN `product_name_snapshot` varchar(255) DEFAULT NULL AFTER `product_id`,
+    ADD COLUMN `product_image_snapshot` varchar(500) DEFAULT NULL AFTER `product_name_snapshot`;

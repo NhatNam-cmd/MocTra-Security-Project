@@ -128,6 +128,8 @@ public class CheckoutController extends HttpServlet {
                         item.getProduct().getSalePrice() :
                         item.getProduct().getPrice();
                 auditItem.setPrice(finalPrice);
+                auditItem.setProductNameSnapshot(item.getProduct().getName());
+                auditItem.setProductImageSnapshot(item.getProduct().getImageUrl());
                 auditItems.add(auditItem);
             }
             order.setItems(auditItems);
